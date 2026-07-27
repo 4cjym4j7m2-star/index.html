@@ -1,0 +1,148 @@
+date-invite/
+├─ app/
+│  ├─ page.tsx
+│  ├─ success/page.tsx
+│  └─ api/send/route.ts
+├─ components/
+│  ├─ Step1Invite.tsx
+│  ├─ Step2Date.tsx
+│  ├─ Step3Time.tsx
+│  ├─ Step4Activity.tsx
+│  └─ Step5Confirm.tsx
+├─ public/
+│  ├─ cat1.png
+│  ├─ cat2.gif
+│  └─ heart.png
+├─ .env.local
+├─ tailwind.config.js
+└─ package.json
+
+npx create-next-app@latest date-invite
+cd date-invite
+
+npm install framer-motion
+npm install resend
+npm install react-calendar
+
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxx
+
+TO_EMAIL=yourmail@gmail.com
+
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: process.env.TO_EMAIL!,
+      subject: "💌 Шинэ болзооны хүсэлт",
+      html: `
+        <h2>Шинэ хариулт ирлээ</h2>
+
+        <p><b>Өдөр:</b> ${body.date}</p>
+        <p><b>Цаг:</b> ${body.time}</p>
+        <p><b>Төрөл:</b> ${body.activity}</p>
+      `,
+    });
+
+    return Response.json({ success: true });
+  } catch (e) {
+    return Response.json({ success: false });
+  }
+}
+
+"use client";
+
+import { motion } from "framer-motion";
+
+export default function Step1Invite({
+  onNext,
+}: {
+  onNext: () => void;
+}) {
+  return (
+    <div className="text-center">
+
+      <img
+        src="/cat1.png"
+        className="w-32 mx-auto"
+      />
+
+      <h1 className="text-4xl font-bold text-pink-600 mt-8">
+        Надтай болзоонд явах уу?
+      </h1>
+
+      <button
+        onClick={onNext}
+        className="mt-8 bg-pink-500 text-white px-10 py-4 rounded-full"
+      >
+        Тийм ❤️
+      </button>
+
+    </div>
+  );
+}
+
+"use client";
+
+import Calendar from "react-calendar";
+
+export default function Step2Date({
+  value,
+  setValue,
+  next,
+}: any) {
+  return (
+    <div>
+
+      <h2>📅 Өдөр сонгоорой</h2>
+
+      <Calendar
+        value={value}
+        onChange={setValue}
+      />
+
+      <button onClick={next}>
+        Дараа →
+      </button>
+
+    </div>
+  );
+} const times = [
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
+  "19:30",
+];
+
+const activities = [
+  "☕ Кофе",
+  "🎬 Кино",
+  "🍜 Хоол",
+  "🌷 Алхалт",
+  "🎁 Сюрприз",
+];
+
+await fetch("/api/send", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    date,
+    time,
+    activity,
+  }),
+});
+
+<h1>
+💖 Зөвшөөрсөнд баярлалаа
+</h1>
+
+<img src="/cat2.gif" />
